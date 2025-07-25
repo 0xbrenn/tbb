@@ -1,0 +1,335 @@
+# AI-Powered Twitter Bot
+
+A sophisticated Node.js Twitter bot that uses AI (Claude/GPT) to post tweets and respond to mentions, with a comprehensive test mode for safe experimentation.
+
+## Features
+
+- **AI-Driven Content**: Uses Claude API to generate authentic tweets matching your personality
+- **Smart Responses**: Intelligently responds to mentions with context awareness
+- **Test Mode**: Review and approve all content before posting
+- **Personality Cloning**: Learns from your tweet history to match your style
+- **Content Safety**: Built-in filtering and risk assessment
+- **Analytics Dashboard**: Track performance and engagement
+- **Scheduled Posting**: Optimal timing based on engagement patterns
+- **Conversation Tracking**: Maintains context across thread discussions
+
+## Prerequisites
+
+- Node.js 16+
+- Twitter Developer Account with API access
+- Supabase account for database
+- Anthropic API key (for Claude) or OpenAI API key
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <your-repo>
+cd twitter-bot
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your credentials
+```
+
+4. Set up Supabase database:
+   - Create a new Supabase project
+   - Run the SQL schema in `database-schema.sql`
+   - Copy your Supabase URL and keys to `.env`
+
+5. Import your Twitter history (optional):
+   - Download your Twitter archive
+   - Run: `npm run import-tweets` (you'll need to create this script)
+
+## Configuration
+
+### Environment Variables
+
+```env
+# Twitter API
+TWITTER_API_KEY=your_api_key
+TWITTER_API_SECRET=your_api_secret
+TWITTER_ACCESS_TOKEN=your_access_token
+TWITTER_ACCESS_SECRET=your_access_secret
+
+# Supabase
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_KEY=your_service_key
+
+# AI Provider
+ANTHROPIC_API_KEY=your_claude_api_key
+
+# Bot Settings
+BOT_USERNAME=your_twitter_handle
+TWEETS_PER_DAY=3
+MAX_REPLIES_PER_HOUR=5
+ENABLE_AUTO_POSTING=false  # Set to true for production
+```
+
+### Personality Configuration
+
+Edit personality settings in the dashboard or directly in the database:
+
+```javascript
+{
+  name: "Your Name",
+  bio: "Your bio",
+  interests: ["tech", "startups", "AI"],
+  writing_style: "casual and witty",
+  tone: "friendly",
+  topics: ["technology", "innovation"],
+  avoid_topics: ["politics", "religion"],
+  quirks: ["uses emojis", "asks questions"]
+}
+```
+
+## Usage
+
+### Test Mode (Recommended to start)
+
+```bash
+npm run test-mode
+```
+
+This starts the bot in test mode where:
+- All tweets go to a review queue
+- Access dashboard at `http://localhost:3001`
+- Manually approve/edit/reject each tweet
+- Run simulations to test behavior
+
+### Production Mode
+
+```bash
+npm run production
+```
+
+In production mode:
+- Auto-posts approved content
+- Automatically responds to mentions
+- Follows scheduled posting times
+- Still logs all activity for monitoring
+
+### Development Mode
+
+```bash
+npm run dev
+```
+
+Uses nodemon for auto-reloading during development.
+
+## Dashboard Features
+
+Access the test dashboard at `http://localhost:3001` to:
+
+### Test Queue
+- Review generated tweets before posting
+- Edit content inline
+- See AI analysis (sentiment, style match, risk score)
+- Approve or reject tweets
+
+### Simulation Tools
+- **Day Simulation**: Generate a full day's worth of tweets
+- **Week Simulation**: Test a week of activity
+- **Personality Test**: Check consistency across multiple tweets
+
+### Analytics
+- Track tweets posted
+- Monitor reply activity
+- View engagement metrics
+- Analyze skipped mentions
+
+### Configuration
+- Update personality settings
+- Modify topics and interests
+- Adjust writing style
+- Set content filters
+
+## API Endpoints
+
+The dashboard exposes these endpoints:
+
+- `GET /api/test-queue` - Get pending tweets
+- `POST /api/test-queue/:id/approve` - Approve a tweet
+- `POST /api/test-queue/:id/reject` - Reject a tweet
+- `PUT /api/test-queue/:id` - Edit tweet content
+- `POST /api/generate-tweet` - Generate new tweet
+- `POST /api/analyze-content` - Analyze tweet content
+- `GET /api/analytics` - Get analytics data
+- `GET /api/personality-config` - Get personality settings
+- `PUT /api/personality-config` - Update personality
+
+## Architecture
+
+### Services
+- **twitter.service.js** - Twitter API integration
+- **ai.service.js** - Claude/GPT integration
+- **supabase.service.js** - Database operations
+- **scheduler.service.js** - Cron job management
+
+### Controllers
+- **tweet.controller.js** - Tweet generation and posting
+- **response.controller.js** - Mention handling and replies
+
+### Utilities
+- **content-filter.js** - Safety checks and filtering
+- **personality.js** - Style matching and analysis
+- **logger.js** - Structured logging
+
+## Safety Features
+
+### Content Filtering
+- Sentiment analysis
+- Banned word detection
+- Spam pattern recognition
+- Excessive caps/hashtag/mention detection
+
+### Rate Limiting
+- Respects Twitter API limits
+- Internal posting limits
+- Reply frequency controls
+- Automatic backoff on errors
+
+### Risk Assessment
+- Controversy detection
+- Engagement prediction
+- Style consistency checking
+- Topic appropriateness
+
+## Database Schema
+
+### Core Tables
+- `personality_config` - Bot personality settings
+- `training_tweets` - Your historical tweets
+- `tweets` - Posted tweets
+- `scheduled_posts` - Tweet queue
+- `test_queue` - Review queue
+- `conversations` - Thread tracking
+- `interaction_log` - All bot activity
+
+## Best Practices
+
+### Getting Started
+1. Start in test mode
+2. Import your tweet history
+3. Configure personality settings
+4. Run simulations
+5. Review and refine
+6. Gradually enable features
+
+### Monitoring
+- Check logs regularly
+- Review skipped mentions
+- Monitor engagement metrics
+- Adjust personality as needed
+
+### Safety
+- Always use test mode first
+- Set conservative rate limits
+- Review controversial topics
+- Keep content filters updated
+
+## Troubleshooting
+
+### Common Issues
+
+**Bot not posting tweets:**
+- Check `ENABLE_AUTO_POSTING` is true
+- Verify Twitter API credentials
+- Check rate limits
+- Review logs for errors
+
+**Poor style matching:**
+- Import more training tweets
+- Refine personality config
+- Adjust writing style settings
+- Run consistency tests
+
+**High risk scores:**
+- Review content filters
+- Check avoided topics
+- Adjust tone settings
+- Enable stricter filtering
+
+### Debug Mode
+
+Set `LOG_LEVEL=debug` in `.env` for verbose logging.
+
+## Advanced Features
+
+### Custom Response Templates
+Add common response patterns to improve consistency:
+
+```javascript
+{
+  trigger_pattern: "how does .* work",
+  response_template: "Great question! {topic} works by...",
+  category: "educational"
+}
+```
+
+### Keyword Monitoring
+Track specific terms and engage with relevant discussions:
+
+```javascript
+await responseController.monitorKeywords([
+  'your_product_name',
+  'your_industry_term'
+]);
+```
+
+### Thread Creation
+Post multi-tweet threads:
+
+```javascript
+await tweetController.createThread([
+  "1/ Here's a thread about AI safety...",
+  "2/ First, we need to understand...",
+  "3/ The key challenges are..."
+]);
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new features
+4. Submit a pull request
+
+## Security Notes
+
+- Never commit `.env` files
+- Use service role keys carefully
+- Enable RLS on all tables
+- Rotate API keys regularly
+- Monitor for suspicious activity
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions:
+- Check logs first
+- Review this README
+- Check closed GitHub issues
+- Open a new issue with details
+
+## Roadmap
+
+- [ ] Media upload support
+- [ ] Advanced analytics
+- [ ] Multi-account support
+- [ ] Webhook integrations
+- [ ] Mobile app for approvals
+- [ ] A/B testing framework
+- [ ] Advanced thread planning
+- [ ] Competitor analysis
